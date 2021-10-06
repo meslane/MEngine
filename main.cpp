@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
+#include "image.h"
 
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -44,9 +45,9 @@ int main(void) {
 
 	/* temporoary triangle stuff */
 	float vertices[] = {
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.0f,  0.5f, 0.0f
+	-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 5.0f, 0.0f,
+	 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 2.5f, 2.5f
 	};
 
 	GLuint VBO;
@@ -57,14 +58,22 @@ int main(void) {
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), NULL); //position
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); //color
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //texture
+	glEnableVertexAttribArray(2);
+
+	GLuint texture = createTextureFromBMP("amogus.bmp", GL_MIRRORED_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
 	/* main loop */
 	while (!glfwWindowShouldClose(window)) {
 		/* draw background color */
 		glClearColor(0.0f, 0.2f, 0.5f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		/* draw triangle */
 		glUseProgram(shaderProgram);

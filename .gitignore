@@ -6,3 +6,4 @@ glad.c
 *.vcxproj
 *.filters
 *.user
+*.bmp

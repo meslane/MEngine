@@ -5,7 +5,9 @@
 #include <string>
 #include <glad/glad.h>
 
-GLuint createShaderFromFile(GLenum shaderType, const char* filename) {
+#include "image.h"
+
+GLuint createShaderFromFile(const GLenum shaderType, const char* filename) {
 	GLuint shader = glCreateShader(shaderType);
 	std::string fileText;
 
@@ -53,4 +55,31 @@ GLuint createShaderProgram(const GLuint* shaderArray, const unsigned int num) {
 	}
 
 	return shaderProgram;
+}
+
+GLuint createTextureFromBMP(const char* filename, const GLenum wrap, const GLenum min, const GLenum mag) {
+	GLuint texture;
+	char* data = getBMPData(filename);
+	const unsigned int width = getBMPDimension(filename, 'w');
+	const unsigned int height = getBMPDimension(filename, 'h');
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "ERROR: failed to create texture from " << filename << std::endl;
+		return 0;
+	}
+
+	delete data;
+	return texture;
 }
